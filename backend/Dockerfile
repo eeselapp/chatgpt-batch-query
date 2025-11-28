@@ -36,8 +36,8 @@ WORKDIR /app
 # Copy package files first for better Docker layer caching
 COPY package*.json ./
 
-# Install dependencies (using npm ci for faster, reliable installs)
-RUN npm ci --only=production && npm cache clean --force
+# Install dependencies
+RUN npm install --only=production && npm cache clean --force
 
 # Copy only necessary application files
 COPY server.js ./
