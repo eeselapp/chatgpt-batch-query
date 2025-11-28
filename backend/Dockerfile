@@ -1,6 +1,6 @@
 FROM node:20-slim
 
-# Install minimal dependencies for Puppeteer bundled Chromium (much faster than installing Chrome)
+# Install minimal dependencies for Puppeteer bundled Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     fonts-liberation \
@@ -29,12 +29,16 @@ WORKDIR /app
 # Copy package files first for better Docker layer caching
 COPY package*.json ./
 
-# Install dependencies (Puppeteer will download bundled Chromium automatically)
-# Set PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false to ensure Chromium is downloaded
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+# Skip Chromium download during npm install to speed up build
+# Chromium will be downloaded on first run (or we can download it separately)
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_CACHE_DIR=/root/.cache/puppeteer
 
+# Install dependencies without Chromium download (much faster)
 RUN npm install --only=production --prefer-offline --no-audit && npm cache clean --force
+
+# Download Chromium separately using Puppeteer's download script (more reliable)
+RUN npx puppeteer browsers install chrome || echo "Chromium download failed, will download on first run"
 
 # Copy only necessary application files
 COPY server.js ./
