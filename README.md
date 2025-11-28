@@ -1,67 +1,123 @@
 # ChatGPT Batch Scraper
 
-Aplikasi web fullstack untuk melakukan batch scraping dari ChatGPT dengan fitur export ke CSV.
+A full-stack web application for batch scraping ChatGPT conversations with CSV export functionality.
 
-## Tech Stack
+## 🚀 Features
 
-- **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, Shadcn UI
-- **Backend:** Node.js, Express, Puppeteer (dengan `puppeteer-extra` dan `stealth`), Multer
+- **Multiple Input Methods:**
+  - Manual input (one question per line)
+  - CSV/Excel file upload (first column contains questions)
+  - Automatic header detection for CSV files
+
+- **Advanced Scraping:**
+  - Isolation mode: Each question opens a new browser instance (full isolation)
+  - Uses Puppeteer with stealth plugin to avoid detection
+  - Supports ChatGPT login for more accurate results
+  - Real-time progress tracking with Server-Sent Events (SSE)
+
+- **Output:**
+  - JSON response with format: `{ question, answer, sources }`
+  - Automatic CSV export
+  - `sources` field contains discovered URLs (comma-separated)
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Next.js 16 (App Router), TypeScript, Tailwind CSS, Shadcn UI
+- **Backend:** Node.js, Express, Puppeteer (with `puppeteer-extra` and `stealth` plugin), Multer
 - **Deployment:** 
-  - Backend: Koyeb (Docker)
-  - Frontend: Vercel
+  - Backend: Docker (Koyeb compatible)
+  - Frontend: Vercel or Docker
 
-## Fitur
+## 📋 Prerequisites
 
-1. **Input Multiple Questions:**
-   - Manual input (satu per baris)
-   - Upload file CSV/Excel (kolom pertama berisi pertanyaan)
-   - Deteksi header otomatis untuk CSV
+- Node.js 20 or higher
+- npm or yarn
+- Git
+- Chrome/Chromium browser (for Puppeteer)
 
-2. **Scraping dengan Isolation Mode:**
-   - Setiap pertanyaan membuka browser baru (isolasi penuh)
-   - Menggunakan Puppeteer dengan stealth plugin
-   - Support login ChatGPT untuk hasil yang lebih akurat
+## 🚀 Quick Start
 
-3. **Output:**
-   - JSON response dengan format: `{ question, answer, sources }`
-   - Export otomatis ke CSV
-   - Field `sources` berisi URL yang ditemukan (comma separated)
+### Option 1: Automated Setup (Recommended)
 
-## Setup Development
+Run the setup script to automatically configure the project:
 
-### Backend
+```bash
+git clone https://github.com/your-username/chatgpt-scrapper.git
+cd chatgpt-scrapper
+./setup.sh
+```
+
+Then start the services:
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+npm run dev
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+npm run dev
+```
+
+Open `http://localhost:3000` in your browser.
+
+### Option 2: Manual Setup
+
+#### Backend Setup
 
 ```bash
 cd backend
 npm install
 cp .env.example .env
-# Edit .env sesuai kebutuhan
+# Edit .env if needed
 npm run dev
 ```
 
-Backend akan berjalan di `http://localhost:3001`
+Backend will run at `http://localhost:3001`
 
-### Frontend
+#### Frontend Setup
 
 ```bash
 cd frontend
 npm install
 cp .env.local.example .env.local
-# Edit NEXT_PUBLIC_API_URL jika backend di URL berbeda
+# Edit NEXT_PUBLIC_API_URL if backend is on a different URL
 npm run dev
 ```
 
-Frontend akan berjalan di `http://localhost:3000`
+Frontend will run at `http://localhost:3000`
 
-## Environment Variables
+### Option 3: Docker Compose
+
+Run both services with Docker Compose:
+
+```bash
+docker-compose up
+```
+
+This will start:
+- Backend at `http://localhost:3001`
+- Frontend at `http://localhost:3000`
+
+## ⚙️ Environment Variables
 
 ### Backend (.env)
 
 ```env
 PORT=3001
-CORS_ORIGIN=http://localhost:3000
 NODE_ENV=development
+CORS_ORIGIN=http://localhost:3000
+HEADLESS=true
 ```
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `3001` |
+| `NODE_ENV` | Environment mode | `development` |
+| `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:3000` |
+| `HEADLESS` | Run browser in headless mode | `true` |
 
 ### Frontend (.env.local)
 
@@ -69,56 +125,50 @@ NODE_ENV=development
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-## Deployment
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_API_URL` | Backend API URL | `http://localhost:3001` |
 
-### Backend (Koyeb)
+## 📁 Project Structure
 
-1. Build Docker image:
-```bash
-cd backend
-docker build -t chatgpt-scraper-backend .
+```
+chatgpt-scrapper/
+├── backend/
+│   ├── server.js          # Express server with Puppeteer
+│   ├── Dockerfile         # Docker configuration
+│   ├── package.json
+│   └── .env.example       # Environment variables template
+├── frontend/
+│   ├── app/               # Next.js app directory
+│   ├── components/        # React components
+│   ├── lib/               # Utility functions
+│   ├── Dockerfile         # Docker configuration
+│   ├── package.json
+│   └── .env.local.example # Environment variables template
+├── docker-compose.yml     # Docker Compose configuration
+├── setup.sh              # Automated setup script
+├── CONTRIBUTING.md       # Contribution guidelines
+├── LICENSE               # ISC License
+└── README.md             # This file
 ```
 
-2. Deploy ke Koyeb:
-   - Push code ke GitHub
-   - Connect repository di Koyeb
-   - Koyeb akan otomatis detect Dockerfile dan deploy
+## 📝 File Upload Format
 
-3. Set environment variables di Koyeb dashboard:
-   - `PORT=3001`
-   - `CORS_ORIGIN=https://your-frontend-domain.vercel.app`
-   - `NODE_ENV=production`
-
-### Frontend (Vercel)
-
-1. Push code ke GitHub
-2. Import project di Vercel
-3. Set environment variable:
-   - `NEXT_PUBLIC_API_URL=https://your-backend-domain.koyeb.app`
-4. Deploy
-
-## Catatan Penting
-
-⚠️ **Login ChatGPT:** Untuk mendapatkan hasil yang akurat dengan sources, disarankan login ke ChatGPT dengan email baru. Browser akan dibuka untuk proses login sebelum scraping dimulai.
-
-⚠️ **Error Handling:** Jika satu pertanyaan gagal, proses akan berhenti dan menampilkan error message.
-
-## Format File Upload
-
-### CSV
-- Kolom pertama berisi pertanyaan
-- Pilih checkbox "File has header row" jika file memiliki header
+### CSV Files
+- First column contains questions
+- Check "File has header row" if your file has a header
 - Format: `question1,other_data\nquestion2,other_data`
 
-### Excel (.xlsx, .xls)
-- Sheet pertama akan digunakan
-- Kolom pertama berisi pertanyaan
-- Header akan otomatis di-skip jika terdeteksi
+### Excel Files (.xlsx, .xls)
+- First sheet will be used
+- First column contains questions
+- Header will be automatically skipped if detected
 
-## API Endpoints
+## 🔌 API Endpoints
 
 ### POST `/api/scrape`
-Scrape multiple questions dari ChatGPT.
+
+Scrape multiple questions from ChatGPT.
 
 **Request:**
 ```json
@@ -142,9 +192,10 @@ Scrape multiple questions dari ChatGPT.
 ```
 
 ### POST `/api/upload`
-Upload dan parse file CSV/Excel.
 
-**Request:** Form data dengan field `file` dan `hasHeader` (true/false)
+Upload and parse CSV/Excel file.
+
+**Request:** Form data with field `file` and `hasHeader` (true/false)
 
 **Response:**
 ```json
@@ -154,7 +205,133 @@ Upload dan parse file CSV/Excel.
 }
 ```
 
-## License
+### GET `/api/progress/:sessionId`
 
-ISC
+Get real-time scraping progress via Server-Sent Events (SSE).
 
+## 🐳 Docker Deployment
+
+### Backend Only
+
+```bash
+cd backend
+docker build -t chatgpt-scraper-backend .
+docker run -p 3001:3001 \
+  -e PORT=3001 \
+  -e CORS_ORIGIN=http://localhost:3000 \
+  -e NODE_ENV=production \
+  -e HEADLESS=true \
+  chatgpt-scraper-backend
+```
+
+### Full Stack with Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+## ☁️ Cloud Deployment
+
+### Backend (Koyeb)
+
+1. Build Docker image:
+   ```bash
+   cd backend
+   docker build -t chatgpt-scraper-backend .
+   ```
+
+2. Deploy to Koyeb:
+   - Push code to GitHub
+   - Connect repository in Koyeb
+   - Koyeb will automatically detect Dockerfile and deploy
+
+3. Set environment variables in Koyeb dashboard:
+   - `PORT=3001`
+   - `CORS_ORIGIN=https://your-frontend-domain.vercel.app`
+   - `NODE_ENV=production`
+   - `HEADLESS=true`
+
+### Frontend (Vercel)
+
+1. Push code to GitHub
+2. Import project in Vercel
+3. Set environment variable:
+   - `NEXT_PUBLIC_API_URL=https://your-backend-domain.koyeb.app`
+4. Deploy
+
+## ⚠️ Important Notes
+
+- **ChatGPT Login:** For accurate results with sources, it's recommended to log in to ChatGPT with a new email. The browser will open for the login process before scraping begins.
+
+- **Error Handling:** If one question fails, the process will stop and display an error message.
+
+- **Resource Requirements:** 
+  - Backend requires at least 1GB RAM for Puppeteer
+  - Ensure your deployment plan has sufficient resources
+
+- **Rate Limiting:** The application does not have built-in rate limiting. Consider adding rate limiting if needed for production use.
+
+## 🐛 Troubleshooting
+
+### Puppeteer cannot install Chromium
+
+**Linux:**
+```bash
+sudo apt-get update
+sudo apt-get install -y chromium-browser
+```
+
+**macOS:**
+```bash
+brew install chromium
+```
+
+**Alternative:** Set `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true` and install Chrome manually.
+
+### Port already in use
+
+- Change `PORT` in `.env` (backend) or use a different port
+- Frontend default: 3000, Backend default: 3001
+
+### Backend cannot connect to frontend
+
+- Ensure `CORS_ORIGIN` in backend `.env` matches your frontend URL
+- Check that `NEXT_PUBLIC_API_URL` in frontend `.env.local` matches your backend URL
+
+### Scraping fails
+
+- Ensure ChatGPT is not blocking requests
+- Check logs for detailed error messages
+- Verify browser/Chrome is installed correctly
+- Try setting `HEADLESS=false` to see what's happening
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'feat: Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Puppeteer](https://pptr.dev/) - Headless Chrome Node.js API
+- [Next.js](https://nextjs.org/) - React framework
+- [Shadcn UI](https://ui.shadcn.com/) - UI components
+
+## 📧 Support
+
+If you encounter any issues or have questions:
+- Open an issue on GitHub
+- Check existing issues and discussions
+- Review the documentation
+
+---
+
+Made with ❤️ by the open source community

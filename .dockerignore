@@ -1,5 +1,6 @@
 node_modules
 npm-debug.log
+.next
 .env
 .env.local
 .env*.local
@@ -12,5 +13,4 @@ chrome-user-data
 user-data-dir
 uploads
 debug-screenshot.png
-coverage
-.nyc_output
+

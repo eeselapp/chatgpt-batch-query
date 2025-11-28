@@ -1,5 +1,6 @@
 node_modules
 npm-debug.log
+.next
 .env
 .env.local
 .env*.local
@@ -8,9 +9,7 @@ npm-debug.log
 README.md
 .DS_Store
 *.log
-chrome-user-data
-user-data-dir
-uploads
-debug-screenshot.png
 coverage
 .nyc_output
+.vercel
+
