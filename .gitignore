@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.local
+*.log
+*.png
+.DS_Store
+dist/
+build/
+.next/
+.vercel/
+# Chrome user data (from Puppeteer)
+chrome-user-data/
+user-data-dir/
+uploads/
+debug-screenshot.png
+
