@@ -6,5 +6,10 @@ node_modules
 uploads/
 .DS_Store
 user-data-dir/
+chrome-user-data/
 .git
+frontend/
+debug-screenshot.png
+*.test.js
+*.spec.js
 
