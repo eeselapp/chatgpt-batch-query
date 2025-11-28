@@ -29,16 +29,13 @@ WORKDIR /app
 # Copy package files first for better Docker layer caching
 COPY package*.json ./
 
-# Skip Chromium download during npm install to speed up build
-# Chromium will be downloaded on first run (or we can download it separately)
+# Skip Chromium download during npm install to speed up build significantly
+# Chromium will be downloaded automatically on first Puppeteer launch (slower first request, but faster build)
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_CACHE_DIR=/root/.cache/puppeteer
 
-# Install dependencies without Chromium download (much faster)
-RUN npm install --only=production --prefer-offline --no-audit && npm cache clean --force
-
-# Download Chromium separately using Puppeteer's download script (more reliable)
-RUN npx puppeteer browsers install chrome || echo "Chromium download failed, will download on first run"
+# Install dependencies without Chromium download (saves 3-5 minutes)
+RUN npm install --only=production --prefer-offline --no-audit --progress=false && npm cache clean --force
 
 # Copy only necessary application files
 COPY server.js ./
