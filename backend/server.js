@@ -1106,10 +1106,109 @@ app.post('/api/login', async (req, res) => {
     await page.setViewport({ width: 1920, height: 1080 });
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
-    await page.goto('https://auth.openai.com/log-in', { waitUntil: 'networkidle2' });
+    // Navigate to chatgpt.com instead of auth.openai.com
+    console.log('🌐 Navigating to chatgpt.com...');
+    await page.goto('https://chatgpt.com', { waitUntil: 'networkidle2', timeout: 30000 });
 
     // Wait a bit for page to load
     await new Promise(r => setTimeout(r, 3000));
+
+    // Automatically click the login button
+    console.log('🔍 Looking for login button...');
+    try {
+      const loginButtonClicked = await page.evaluate(() => {
+        // Strategy 1: Look for button with "Log in" text
+        const allButtons = document.querySelectorAll('button, a, div[role="button"]');
+        for (const btn of allButtons) {
+          const text = (btn.innerText || btn.textContent || '').toLowerCase().trim();
+          if (text === 'log in' || text === 'login' || text.includes('log in')) {
+            try {
+              // Check if button is visible
+              const style = window.getComputedStyle(btn);
+              const rect = btn.getBoundingClientRect();
+              if (style.display !== 'none' && 
+                  style.visibility !== 'hidden' && 
+                  style.opacity !== '0' &&
+                  rect.width > 0 && 
+                  rect.height > 0) {
+                btn.click();
+                return true;
+              }
+            } catch (e) {
+              // Continue
+            }
+          }
+        }
+        
+        // Strategy 2: Look for links with href containing "auth" or "login"
+        const links = document.querySelectorAll('a[href*="auth"], a[href*="login"]');
+        for (const link of links) {
+          const text = (link.innerText || link.textContent || '').toLowerCase().trim();
+          if (text.includes('log in') || text.includes('login')) {
+            try {
+              const style = window.getComputedStyle(link);
+              const rect = link.getBoundingClientRect();
+              if (style.display !== 'none' && 
+                  style.visibility !== 'hidden' && 
+                  style.opacity !== '0' &&
+                  rect.width > 0 && 
+                  rect.height > 0) {
+                link.click();
+                return true;
+              }
+            } catch (e) {
+              // Continue
+            }
+          }
+        }
+        
+        // Strategy 3: Look for any clickable element with "log in" text
+        const allClickable = document.querySelectorAll('*');
+        for (const el of allClickable) {
+          const text = (el.innerText || el.textContent || '').toLowerCase().trim();
+          if ((text === 'log in' || text === 'login') && 
+              (el.tagName === 'BUTTON' || el.tagName === 'A' || 
+               el.getAttribute('role') === 'button' ||
+               el.onclick !== null ||
+               el.getAttribute('href'))) {
+            try {
+              const style = window.getComputedStyle(el);
+              const rect = el.getBoundingClientRect();
+              if (style.display !== 'none' && 
+                  style.visibility !== 'hidden' && 
+                  style.opacity !== '0' &&
+                  rect.width > 0 && 
+                  rect.height > 0) {
+                if (el.click) {
+                  el.click();
+                } else if (el.tagName === 'A' && el.href) {
+                  window.location.href = el.href;
+                }
+                return true;
+              }
+            } catch (e) {
+              // Continue
+            }
+          }
+        }
+        
+        return false;
+      });
+
+      if (loginButtonClicked) {
+        console.log('✅ Automatically clicked login button');
+        // Wait for navigation to login page
+        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 15000 }).catch(() => {
+          console.log('⚠️ Navigation timeout, but continuing...');
+        });
+        await new Promise(r => setTimeout(r, 2000));
+      } else {
+        console.log('⚠️ Login button not found, may already be on login page or logged in');
+      }
+    } catch (clickError) {
+      console.log('⚠️ Error clicking login button:', clickError.message);
+      // Continue anyway - user might already be on login page
+    }
 
     // Check if already logged in (must verify thoroughly)
     const isAlreadyLoggedIn = await page.evaluate(() => {

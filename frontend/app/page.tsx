@@ -20,11 +20,11 @@ const formatTime = (ms: number): string => {
   const hours = Math.floor(minutes / 60);
   
   if (hours > 0) {
-    return `${hours} jam ${minutes % 60} menit`;
+    return `${hours} hour${hours > 1 ? 's' : ''} ${minutes % 60} minute${(minutes % 60) !== 1 ? 's' : ''}`;
   } else if (minutes > 0) {
-    return `${minutes} menit ${seconds % 60} detik`;
+    return `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds % 60} second${(seconds % 60) !== 1 ? 's' : ''}`;
   } else {
-    return `${seconds} detik`;
+    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
   }
 };
 
@@ -831,26 +831,21 @@ export default function Home() {
                     {progressInfo ? (
                       <>
                         <p className="font-medium">
-                          Memproses {progressInfo.current} dari {progressInfo.total} pertanyaan
+                          Processing {progressInfo.current} of {progressInfo.total} questions
                         </p>
                         {progressInfo.currentQuestion && (
                           <p className="text-slate-400 italic truncate">
                             "{progressInfo.currentQuestion}"
                           </p>
                         )}
-                        {progressInfo.estimatedTimeRemaining !== null && progressInfo.estimatedTimeRemaining > 0 && (
-                          <p className="text-slate-400">
-                            Estimasi waktu tersisa: {formatTime(progressInfo.estimatedTimeRemaining)}
-                          </p>
-                        )}
                         {progressInfo.elapsed > 0 && (
                           <p className="text-slate-400">
-                            Waktu berjalan: {formatTime(progressInfo.elapsed)}
+                            Elapsed time: {formatTime(progressInfo.elapsed)}
                           </p>
                         )}
                       </>
                     ) : (
-                      <p>Memproses pertanyaan...</p>
+                      <p>Processing questions...</p>
                     )}
                   </div>
                 </div>
