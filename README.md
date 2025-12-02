@@ -35,6 +35,8 @@ A full-stack web application for batch scraping ChatGPT conversations with CSV e
 - Git
 - Chrome/Chromium browser (for Puppeteer)
 
+> **⚠️ Important:** Before running `npm run dev`, make sure to install dependencies first by running `npm install` in both `backend/` and `frontend/` directories.
+
 ## 🚀 Quick Start
 
 ### Option 1: Automated Setup (Recommended)
@@ -52,12 +54,14 @@ Then start the services:
 **Terminal 1 - Backend:**
 ```bash
 cd backend
+npm install  # Install dependencies first
 npm run dev
 ```
 
 **Terminal 2 - Frontend:**
 ```bash
 cd frontend
+npm install  # Install dependencies first
 npm run dev
 ```
 
