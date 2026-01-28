@@ -1,14 +1,14 @@
-# Eesel Tools Collection
+# Lil Tools
 
-A collection of tools for various automation tasks.
+A collection of lightweight tools for various automation tasks.
 
 ## Tools
 
 | Tool | Description |
 |------|-------------|
-| [tools-a](./tools-a/) | ChatGPT Batch Query - Batch processing tool for ChatGPT |
-| [tools-b](./tools-b/) | Coming soon |
-| [tools-c](./tools-c/) | Coming soon |
+| [chatgpt-batch-query](./chatgpt-batch-query/) | Batch processing tool for ChatGPT queries |
+| [daily-digest](./daily-digest/) | Daily digest generator |
+| [infographic-gen](./infographic-gen/) | Infographic generator |
 
 ## Getting Started
 
